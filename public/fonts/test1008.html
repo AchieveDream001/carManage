@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>mapboxtest</title>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        #marker {
+            background: rgba(0, 0, 0, 0.5);
+            color: rgb(226, 68, 68);
+            position: absolute;
+            bottom: 40px;
+            left: 10px;
+            /* padding:5px 10px; */
+            margin: 0;
+            font-size: 11px;
+            line-height: 18px;
+            border-radius: 3px;
+            display: none;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="map"></div>
+    <div id="marker"></div>
+
+    <script>
+        var map = new mapboxgl.Map({
+            container: "map",
+            center: [114.19768515082933, 22.65344925076326],
+            zoom: 9.5,
+            style: {
+                version: 8,
+                name: "mymap",
+                // "glyphs": "http://localhost:3031/fonts/{fontstack}/{range}.pbf",
+                glyphs: "../fonts/{fontstack}/{range}.pbf",
+                sources: {
+                    "region1-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3Aregion1@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "building-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3Abuilding@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "new_highway-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3Anew_highway@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "new_line11-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3Anew_line11@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "new_line22-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3Anew_line22@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "water_polyline-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3Awater_polyline@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "waterway_polyline-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3Awaterway_polyline@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "D221-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3AD221@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "D222-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3AD222@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "D231-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3AD231@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "D321_2-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3AD321_2@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "D323_6-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3AD323_6@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    // "D324-tiles": {
+                    //   type: "vector",
+                    //   scheme: "tms",
+                    //   tiles: [
+                    //     "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3AD324@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                    //   ]
+                    // },
+                    // "D325-tiles": {
+                    //   type: "vector",
+                    //   scheme: "tms",
+                    //   tiles: [
+                    //     "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3AD325@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                    //   ]
+                    // },
+                    // "D326-tiles": {
+                    //   type: "vector",
+                    //   scheme: "tms",
+                    //   tiles: [
+                    //     "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3AD326@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                    //   ]
+                    // },
+                    "D327-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3AD327@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "D33-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3AD33@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "D34-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3AD34@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "D31-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3AD31@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "regionOutline-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3AregionOutline@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "department-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3Adepartment@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "landMarker-tiles": {
+                        type: "vector",
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3AlandMarker@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "Nregion-tiles": {
+                        type: 'vector',
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3ANregion@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "Nregion1-tiles": {
+                        type: 'vector',
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3ANregion1@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    "Nregion2-tiles": {
+                        type: 'vector',
+                        scheme: "tms",
+                        tiles: [
+                            "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3ANregion2@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf"
+                        ]
+                    },
+                    'Nregion1_line-tiles': {
+                        type: 'vector',
+                        scheme: "tms",
+                        tiles: [
+                            'http://localhost:8080/geoserver/gwc/service/tms/1.0.0/mapbox%3ANregion1_line@EPSG%3A900913@pbf/{z}/{x}/{y}.pbf'
+                        ]
+                    }
+                },
+                layers: [
+                    {
+                        id: "background",
+                        type: "background",
+                        layout: { visibility: "visible" },
+                        paint: { "background-opacity": 0.81 }
+                    },
+                    // {
+                    //     id: "region1",
+                    //     type: "fill",
+                    //     source: "region1-tiles",
+                    //     "source-layer": "region1",
+                    //     minzoom: 8,
+                    //     layout: { visibility: "visible" },
+                    //     paint: {
+                    //        
+                    //         "fill-color": [
+                    //             "case",
+                    //             ["match", ["get", "OBJECTID"], [0, 1], true, false],
+                    //             "hsl(210, 55%, 74%)",
+                    //             ["match", ["get", "OBJECTID"], [0, 2], true, false],
+                    //             "hsl(205, 59%, 82%)",
+                    //             ["match", ["get", "OBJECTID"], [3], true, false],
+                    //             "hsl(210, 55%, 74%)",
+                    //             ["match", ["get", "OBJECTID"], [4], true, false],
+                    //             "hsl(205, 59%, 82%)",
+                    //             ["match", ["get", "OBJECTID"], [5], true, false],
+                    //             "hsl(199, 48%, 91%)",
+                    //             ["match", ["get", "OBJECTID"], [6], true, false],
+                    //             "hsl(210, 61%, 69%)",
+                    //             ["match", ["get", "OBJECTID"], [7], true, false],
+                    //             "hsl(212, 70%, 91%)",
+                    //             "hsl(39, 47%, 86%)"
+                    //         ],
+                    //         "fill-outline-color": "hsl(0, 0%, 50%)"
+                    //     }
+                    // },
+                    {
+                        "id": "Nregion",
+                        "type": "fill",
+                        "source": "Nregion-tiles",
+                        "source-layer": "Nregion",
+                        "minzoom": 8,
+                        "maxzoom": 11.2,
+                        "layout": { "visibility": "visible" },
+                        "paint": {
+                            "fill-color": [
+                                "match",
+                                ["get", "gml_id"],
+                                ["layer_township_pg.40640"],
+                                "hsl(204, 59%, 82%)",
+                                ["layer_township_pg.40651"],
+                                "hsl(199, 48%, 91%)",
+                                ["layer_township_pg.40641"],
+                                "hsl(212, 70%, 91%)",
+                                ["layer_township_pg.40685"],
+                                "hsl(204, 59%, 82%)",
+                                ["layer_township_pg.40632"],
+                                "hsl(210, 55%, 74%)",
+                                ["layer_township_pg.40666"],
+                                "hsl(209, 53%, 81%)",
+                                ["layer_township_pg.40677"],
+                                "hsl(204, 59%, 82%)",
+                                ["layer_township_pg.40656"],
+                                "hsl(210, 55%, 74%)",
+                                ["layer_township_pg.40635"],
+                                "hsl(210, 44%, 65%)",
+                                ["layer_township_pg.40669"],
+                                "hsl(199, 48%, 91%)",
+                                "#000000"
+                            ]
+                        }
+                    },
+                    {
+                        "id": "Nregion1",
+                        "type": "fill",
+                        "source": "Nregion1-tiles",
+                        "source-layer": "Nregion1",
+                        "minzoom": 11.2,
+                        "layout": { "visibility": "visible" },
+                        "paint": {
+                            "fill-outline-color": "#434343",
+                            "fill-color": [
+                                "case",
+                                [
+                                    "match",
+                                    ["get", "gml_id"],
+                                    [
+                                        "",
+                                        "layer_township_pg.40647",
+                                        "layer_township_pg.40637",
+                                        "layer_township_pg.40635",
+                                        "layer_township_pg.40650",
+                                        "layer_township_pg.40660",
+                                        "layer_township_pg.40648",
+                                        "layer_township_pg.40638",
+                                        "layer_township_pg.40649"
+                                    ],
+                                    true,
+                                    false
+                                ],
+                                "hsl(210, 61%, 69%)",
+                                [
+                                    "match",
+                                    ["get", "gml_id"],
+                                    [
+                                        "layer_township_pg.40671",
+                                        "layer_township_pg.40682",
+                                        "layer_township_pg.40673",
+                                        "layer_township_pg.40686",
+                                        "layer_township_pg.40687",
+                                        "layer_township_pg.40688",
+                                        "layer_township_pg.40679",
+                                        "layer_township_pg.40669",
+                                        "layer_township_pg.40680"
+                                    ],
+                                    true,
+                                    false
+                                ],
+                                "hsl(199, 48%, 91%)",
+                                [
+                                    "match",
+                                    ["get", "gml_id"],
+                                    [
+                                        "layer_township_pg.40661",
+                                        "layer_township_pg.40671",
+                                        "layer_township_pg.40684",
+                                        "layer_township_pg.40641",
+                                        "layer_township_pg.40642",
+                                        "layer_township_pg.40675",
+                                        "layer_township_pg.40676",
+                                        "layer_township_pg.40691",
+                                        "layer_township_pg.40678"
+                                    ],
+                                    true,
+                                    false
+                                ],
+                                "hsl(212, 70%, 91%)",
+                                [
+                                    "match",
+                                    ["get", "gml_id"],
+                                    [
+                                        "layer_township_pg.40672",
+                                        "layer_township_pg.40651",
+                                        "layer_township_pg.40670"
+                                    ],
+                                    true,
+                                    false
+                                ],
+                                "hsl(199, 48%, 91%)",
+                                [
+                                    "match",
+                                    ["get", "gml_id"],
+                                    ["layer_township_pg.40677"],
+                                    true,
+                                    false
+                                ],
+                                "hsl(204, 59%, 82%)",
+                                [
+                                    "match",
+                                    ["get", "gml_id"],
+                                    [
+                                        "layer_township_pg.40656",
+                                        "layer_township_pg.40657",
+                                        "layer_township_pg.40668",
+                                        "layer_township_pg.40664"
+                                    ],
+                                    true,
+                                    false
+                                ],
+                                "hsl(210, 55%, 74%)",
+                                [
+                                    "match",
+                                    ["get", "gml_id"],
+                                    [
+                                        "layer_township_pg.40683",
+                                        "layer_township_pg.40674",
+                                        "layer_township_pg.40666",
+                                        "layer_township_pg.40681"
+                                    ],
+                                    true,
+                                    false
+                                ],
+                                "hsl(209, 53%, 81%)",
+                                [
+                                    "match",
+                                    ["get", "gml_id"],
+                                    [
+                                        "layer_township_pg.40640",
+                                        "layer_township_pg.40662",
+                                        "layer_township_pg.40663",
+                                        "layer_township_pg.40653",
+                                        "layer_township_pg.40654",
+                                        "layer_township_pg.40655",
+                                        "layer_township_pg.40645",
+                                        "layer_township_pg.40646",
+                                        "layer_township_pg.40658",
+                                        "layer_township_pg.40659"
+                                    ],
+                                    true,
+                                    false
+                                ],
+                                "hsl(204, 59%, 82%)",
+                                [
+                                    "match",
+                                    ["get", "gml_id"],
+                                    [
+                                        "layer_township_pg.40652",
+                                        "layer_township_pg.40630",
+                                        "layer_township_pg.40631",
+                                        "layer_township_pg.40665",
+                                        "layer_township_pg.40643",
+                                        "layer_township_pg.40644",
+                                        "layer_township_pg.40667",
+                                        "layer_township_pg.40625",
+                                        "layer_township_pg.40626",
+                                        "layer_township_pg.40629"
+                                    ],
+                                    true,
+                                    false
+                                ],
+                                "hsl(210, 55%, 74%)",
+                                [
+                                    "match",
+                                    ["get", "gml_id"],
+                                    [
+                                        "layer_township_pg.40685",
+                                        "layer_township_pg.40690",
+                                        "layer_township_pg.40689"
+                                    ],
+                                    true,
+                                    false
+                                ],
+                                "hsl(204, 59%, 82%)",
+                                "#000000"
+                            ]
+                        }
+                    },
+                    {
+                        id: "new_highway",
+                        type: "line",
+                        source: "new_highway-tiles",
+                        "source-layer": "new_highway",
+                        minzoom: 11.2,
+                        layout: { visibility: "visible" },
+                        paint: {
+                            "line-color": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                11,
+                                "hsl(199, 48%, 91%)",
+                                14,
+                                "hsl(110, 50%, 72%)"
+                            ],
+                            "line-width": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                9,
+                                0.2,
+                                20,
+                                3
+                            ]
+                        }
+                    },
+                    {
+                        id: "new_line22",
+                        type: "line",
+                        source: "new_line22-tiles",
+                        "source-layer": "new_line22",
+                        minzoom: 10.4,
+                        layout: { visibility: "visible" },
+                        paint: {
+                            "line-color": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                0,
+                                "hsl(0, 0%, 100%)",
+                                22,
+                                "hsl(0, 0%, 100%)"
+                            ],
+                            "line-width": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                9,
+                                0.5,
+                                20,
+                                5
+                            ]
+                        }
+                    },
+                    {
+                        id: "waterway_polyline",
+                        type: "line",
+                        source: "waterway_polyline-tiles",
+                        "source-layer": "waterway_polyline",
+                        minzoom: 9.6,
+                        layout: {},
+                        paint: { "line-color": "hsl(205, 63%, 78%)", "line-width": 0.4 }
+                    },
+                    // {
+                    //   id: "building-Symb",
+                    //   type: "symbol",
+                    //   source: "composite",
+                    //   "source-layer": "budling-4xsr8b",
+                    //   layout: {
+                    //     "text-field": ["to-string", ["get", "OBJECTID"]],
+                    //     "text-font": ["YaHei"],
+                    //     visibility: "visible",
+                    //     "text-size": [
+                    //       "interpolate",
+                    //       ["linear"],
+                    //       ["zoom"],
+                    //       14,
+                    //       9,
+                    //       22,
+                    //       16
+                    //     ]
+                    //   },
+                    //   paint: {}
+                    // },
+                    {
+                        id: "new_highway-Symb",
+                        type: "symbol",
+                        source: "new_highway-tiles",
+                        "source-layer": "new_highway",
+                        minzoom: 13,
+                        layout: {
+                            "text-font": ["YaHei"],
+                            "text-field": ["to-string", ["get", "NAME"]],
+                            "text-size": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                13.3,
+                                10,
+                                13.7,
+                                13,
+                                15,
+                                16
+                            ],
+                            "symbol-placement": "line",
+                            visibility: "visible"
+                        },
+                        paint: {}
+                    },
+                    {
+                        id: "new_line22-Symb",
+                        type: "symbol",
+                        source: "new_line22-tiles",
+                        "source-layer": "new_line22",
+                        layout: {
+                            "text-font": ["YaHei"],
+                            "text-field": ["to-string", ["get", "NAME"]],
+                            "text-size": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                11,
+                                0,
+                                11.1,
+                                12,
+                                22,
+                                16
+                            ],
+                            visibility: "visible",
+                            "symbol-placement": "line"
+                        },
+                        paint: {}
+                    },
+                    {
+                        id: "new_line11",
+                        type: "line",
+                        source: "new_line11-tiles",
+                        "source-layer": "new_line11",
+                        minzoom: 9,
+                        layout: { visibility: "visible" },
+                        paint: {
+                            "line-color": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                0,
+                                "hsl(0, 0%, 100%)",
+                                22,
+                                "hsl(0, 0%, 100%)"
+                            ],
+                            "line-width": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                9,
+                                0.8,
+                                20,
+                                8
+                            ]
+                        }
+                    },
+                    {
+                        id: "new_line11-Symbl",
+                        type: "symbol",
+                        source: "new_line11-tiles",
+                        "source-layer": "new_line11",
+                        layout: {
+                            "text-font": ["YaHei"],
+                            "text-field": ["to-string", ["get", "NAME"]],
+                            "text-letter-spacing": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                0,
+                                0,
+                                22,
+                                0
+                            ],
+                            visibility: "visible",
+                            "text-size": [
+                                "interpolate",
+                                ["linear"],
+                                ["zoom"],
+                                10.7,
+                                0,
+                                10.8,
+                                9,
+                                13,
+                                9,
+                                22,
+                                16
+                            ],
+                            "symbol-placement": "line"
+                        },
+                        paint: {}
+                    },
+                    {
+                        id: "building",
+                        type: "fill",
+                        source: "building-tiles",
+                        "source-layer": "building",
+                        minzoom: 13.6,
+                        layout: {},
+                        paint: { "fill-color": "hsl(0, 0%, 75%)" }
+                    },
+                    {
+                        id: "D221",
+                        type: "line",
+                        source: "D221-tiles",
+                        "source-layer": "D221",
+                        minzoom: 14,
+                        layout: {},
+                        paint: {
+                            "line-color": "hsl(12, 40%, 64%)",
+                            "line-gap-width": 0.1,
+                            "line-dasharray": [5, 5]
+                        }
+                    },
+                    {
+                        id: "D222",
+                        type: "line",
+                        source: "D222-tiles",
+                        "source-layer": "D222",
+                        minzoom: 14,
+                        layout: {},
+                        paint: {
+                            "line-color": "hsl(13, 44%, 34%)",
+                            "line-gap-width": 0.1,
+                            "line-dasharray": [5, 5],
+                            "line-width": 2
+                        }
+                    },
+                    {
+                        id: "D231",
+                        type: "line",
+                        source: "D231-tiles",
+                        "source-layer": "D231",
+                        minzoom: 16,
+                        layout: {},
+                        paint: { "line-color": "hsl(0, 0%, 85%)", "line-width": 1 }
+                    },
+                    {
+                        id: "D327",
+                        type: "fill",
+                        source: "D327-tiles",
+                        "source-layer": "D327",
+                        minzoom: 15,
+                        layout: {},
+                        paint: {
+                            "fill-color": "hsl(0, 0%, 96%)",
+                            "fill-outline-color": "hsl(0, 0%, 96%)"
+                        }
+                    },
+                    {
+                        id: "D31",
+                        type: "fill",
+                        source: "D31-tiles",
+                        "source-layer": "D31",
+                        minzoom: 14,
+                        layout: { visibility: "visible" },
+                        paint: {
+                            "fill-color": "hsl(21, 16%, 82%)",
+                            "fill-outline-color": "hsl(80, 14%, 66%)"
+                        }
+                    },
+                    {
+                        'id': 'D31-3D',
+                        'type': 'fill-extrusion',
+                        'source': "D31-tiles",
+                        'source-layer': 'D31',
+                        'filter': ["==", "hasHeight", '1'],
+                        "paint": {
+                            "fill-extrusion-color": [
+                                "interpolate",
+                                ['linear'],
+                                ['zoom'],
+                                15,
+                                "#afbde2",//"#0015ff",
+                                22,
+                                "#8cb7ff",
+                            ],
+                            'fill-extrusion-height': ["get", "height"],
+                            'fill-extrusion-base': 0,//["to-number",["get","height"]],
+                            'fill-extrusion-opacity': 0.6
+                        },
+                        "minzoom": 15,
+                        "light": {
+                            "anchor": "viewport",
+                            "color": "white",
+                            "intensity": 1
+                        }
+                    },
+                    // {
+                    //     id: "regionOutline",
+                    //     type: "line",
+                    //     source: "regionOutline-tiles",
+                    //     "source-layer": "regionOutline",
+                    //     layout: {},
+                    //     paint: {
+                    //         "line-color": "hsl(202, 85%, 77%)",
+                    //         "line-width": ["interpolate", ["linear"], ["zoom"], 0, 1, 22, 1]
+                    //     }
+                    // },
+                    {
+                        "id": "Nregion2",
+                        "type": "line",
+                        "source": "Nregion2-tiles",
+                        "source-layer": "Nregion2",
+                        "layout": {},
+                        maxzoom: 11.2,
+                        "paint": {
+                            // "line-color": "hsl(197, 85%, 77%)"
+                            "line-color": "hsl(40, 76%, 48%)",
+                            //"line-width": ["interpolate", ["linear"], ["zoom"], 0, 1, 22, 1]
+                        }
+                    },
+                    {
+                        id: 'Nregion1_line',
+                        type: 'line',
+                        "source": 'Nregion1_line-tiles',
+                        "source-layer": "Nregion1_line",
+                        minzoom: 11.2,
+                        layout: {},
+                        paint: {
+                            "line-color": "#000000"
+                        }
+                    },
+                    {
+                        id: "water_polyline",
+                        type: "line",
+                        source: "water_polyline-tiles",
+                        "source-layer": "water_polyline",
+                        minzoom: 9.6,
+                        layout: { visibility: "visible" },
+                        paint: { "line-color": "hsl(205, 78%, 61%)" }
+                    },
+                    {
+                        "id": "Nregion-Symb",
+                        "type": "symbol",
+                        "source": "Nregion-tiles",
+                        "source-layer": "Nregion",
+                        "layout": {
+                            "text-field": ["to-string", ["get", "countyname"]],
+                            // "text-size": 11,
+                            "text-font": ["YaHei"],
+                        },
+                        "paint": { "text-color": "#666666" }
+                    },
+                    {
+                        "id": "Nregion1-Symb",
+                        "type": "symbol",
+                        "source": "Nregion1-tiles",
+                        "source-layer": "Nregion1",
+                        "minzoom": 11.2,
+                        "layout": {
+                            "text-field": ["to-string", ["get", "Name"]],
+                            // "text-size": 11,
+                            "text-font": ["YaHei"],
+                        },
+                        "paint": { "text-color": "#666666" }
+                    },
+                    // {
+                    //     id: "regionName",
+                    //     type: "symbol",
+                    //     source: "region1-tiles",
+                    //     "source-layer": "region1",
+                    //     layout: {
+                    //         "text-font": ["YaHei"],
+                    //         "text-field": ["get", "name"]
+                    //     },
+                    //     paint: { "text-color": "#666666" }
+                    //     //paint: { "text-color": "hsl(0, 3%, 77%)" }
+                    // },
+                    // {
+                    //   id: "newlcm",
+                    //   type: "fill",
+                    //   source: "composite",
+                    //   "source-layer": "newLCM-c4m68b",
+                    //   layout: {},
+                    //   paint: { "fill-color": "hsl(238, 62%, 91%)" }
+                    // },
+                    // {
+                    //   id: "budling-4",
+                    //   type: "line",
+                    //   source: "composite",
+                    //   "source-layer": "budling-4xsr8b",
+                    //   minzoom: 13.6,
+                    //   layout: {},
+                    //   paint: { "line-color": "hsl(0, 3%, 55%)" }
+                    // },
+                    // {
+                    //   id: "newlcm",
+                    //   type: "line",
+                    //   source: "composite",
+                    //   "source-layer": "newLCM-c4m68b",
+                    //   layout: {},
+                    //   paint: { "line-color": "hsl(0, 0%, 50%)", "line-width": 1 }
+                    // },
+                    {
+                        'id': 'D33',
+                        'type': 'fill',
+                        'source': "D33-tiles",
+                        'source-layer': 'D33',
+                        'minzoom': 15,
+                        'paint': {
+                            'fill-color': '#F2EFEA',//'#4f5e5a'
+                            'fill-opacity': 0.8,
+                            // 'fill-outline-color':"#F2EFEA"
+                        }
+                    },
+                    {
+                        id: "D323-4-5-6",
+                        type: "fill",
+                        source: "D323_6-tiles",
+                        "source-layer": "D323_6",
+                        minzoom: 15,
+                        layout: {},
+                        paint: { "fill-color": "hsl(157, 45%, 77%)" }
+                    },
+                    // {
+                    //   id: "d323-4-5-6-4yxozz (1)",
+                    //   type: "line",
+                    //   source: "composite",
+                    //   "source-layer": "D323_4_5_6-4yxozz",
+                    //   layout: {},
+                    //   paint: { "line-color": "hsl(154, 39%, 68%)", "line-width": 3 }
+                    // },
+                    {
+                        id: "D321_2",
+                        type: "fill",
+                        source: "D321_2-tiles",
+                        "source-layer": "D321_2",
+                        minzoom: 15,
+                        layout: {},
+                        paint: { "fill-color": "hsl(101, 35%, 72%)" }
+                    },
+                    // {
+                    //   id: "d321-2-c2771a (1)",
+                    //   type: "line",
+                    //   source: "composite",
+                    //   "source-layer": "D321_2-c2771a",
+                    //   layout: {},
+                    //   paint: { "line-color": "rgb(165, 189, 157)" }
+                    // },
+                    // {
+                    //   id: "D31",
+                    //   type: "line",
+                    //   source: "D31-tiles",
+                    //   "source-layer": "D31",
+                    //   layout: {},
+                    //   paint: { "line-color": "hsl(80, 14%, 66%)" }
+                    // },
+                    {
+                        id: "D34",
+                        type: "fill",
+                        source: "D34-tiles",
+                        "source-layer": "D34",
+                        minzoom: 15,
+                        layout: { visibility: "visible" },
+                        paint: { "fill-color": "hsl(197, 47%, 78%)" }
+                    },
+                    // {
+                    //   id: "d34",
+                    //   type: "line",
+                    //   source: "composite",
+                    //   "source-layer": "D34-1mahuh",
+                    //   layout: { visibility: "visible" },
+                    //   paint: { "line-color": "hsl(38, 24%, 93%)" }
+                    // },
+                    {
+                        id: "D34-Symb",
+                        type: "symbol",
+                        source: "D34-tiles",
+                        "source-layer": "D34",
+                        minzoom: 15,
+                        layout: {
+                            "text-font": ["YaHei"],
+                            "text-field": ["to-string", ["get", "Name"]],
+                            "text-size": 11
+                        },
+                        paint: {
+                            "text-color": "hsl(200, 28%, 65%)",
+                            "text-halo-color": "hsl(0, 0%, 100%)",
+                            "text-halo-width": 1
+                        }
+                    },
+                    {
+                        id: "D321_2-Symb",
+                        type: "symbol",
+                        source: "D321_2-tiles",
+                        "source-layer": "D321_2",
+                        minzoom: 15,
+                        layout: {
+                            "text-font": ["YaHei"],
+                            "text-field": ["to-string", ["get", "Name"]],
+                            "text-size": 11
+                        },
+                        paint: {
+                            "text-color": "hsl(0, 0%, 50%)",
+                            "text-halo-color": "hsl(0, 0%, 100%)",
+                            "text-halo-width": 1
+                        }
+                    },
+                    {
+                        id: "D323_6-Symb",
+                        type: "symbol",
+                        source: "D323_6-tiles",
+                        "source-layer": "D323_6",
+                        minzoom: 15,
+                        layout: {
+                            "text-font": ["YaHei"],
+                            "text-field": ["to-string", ["get", "Name"]],
+                            "text-size": 11
+                        },
+                        paint: {
+                            "text-color": "hsl(157, 20%, 44%)",
+                            "text-halo-color": "hsl(0, 0%, 100%)",
+                            "text-halo-width": 1
+                        }
+                    },
+                    {
+                        id: "D327-Symb",
+                        type: "symbol",
+                        source: "D327-tiles",
+                        "source-layer": "D327",
+                        minzoom: 15,
+                        layout: {
+                            "text-font": ["YaHei"],
+                            "text-field": ["to-string", ["get", "Name"]],
+                            "text-size": 13
+                        },
+                        paint: {
+                            "text-halo-color": "hsl(0, 0%, 100%)",
+                            "text-halo-width": 1,
+                            "text-color": "hsl(0, 0%, 50%)"
+                        }
+                    },
+                    {
+                        id: "D31-Symb",
+                        type: "symbol",
+                        source: "D31-tiles",
+                        "source-layer": "D31",
+                        minzoom: 14,
+                        layout: {
+                            "text-font": ["YaHei"],
+                            "text-field": ["get", "Name"],
+                            "text-size": 15,
+                            "icon-size": 2
+                        },
+                        paint: {
+                            "text-color": "hsl(33, 11%, 9%)",
+                            "text-halo-color": "hsl(0, 8%, 100%)",
+                            "text-halo-width": 1
+                        }
+                    },
+                    // {
+                    //     id:"departmentMarker",
+                    //     type:"symbol",
+                    //     source:"department-tiles",
+                    //     "source-layer":"department",
+                    //     // maxzoom:14,
+                    //     // layout:{
+                    //     //     // 使用图片资源
+                    //     //     'icon-image': '..\img\department1.png',
+                    //     //     // 缩放
+                    //     //     'icon-size': 1,
+                    //     //     // 旋转角度
+                    //     //     // 'icon-rotate': that.shipInfo.headDirect.value,
+                    //     //     // 偏移量
+                    //     //     'icon-offset': [0, 15],
+                    //     //     // 跟随地图转动，推拉（3d效果那种）Mapbox 中叫 bearing 和 pitch
+                    //     //     'icon-rotation-alignment': 'map',
+                    //     //     'icon-allow-overlap': true,
+                    //     //     'icon-ignore-placement': true
+                    //     // },
+                    //     layout:{
+                    //         "text-font": ["YaHei"],
+                    //         "text-field": ["get", "department"],
+                    //         "text-size": 15,
+                    //         "icon-size": 2
+                    //     },
+                    //     paint:{
+                    //         // 'icon-opacity':0.8,
+                    //         "text-color": "#ff0000",
+                    //         "text-halo-color": "hsl(0, 8%, 100%)",
+                    //         "text-halo-width": 1
+                    //     }
+                    // }
+                ]
+            }
+        });
+
+        map.loadImage('../img/department1.png', function (error, image) {
+            if (error) throw error
+            if (!map.hasImage('departmentIcon1')) {
+                map.addImage('departmentIcon1', image);
+            };
+        });
+        map.loadImage('../img/fire.png', function (error, image) {
+            if (error) throw error
+            if (!map.hasImage('fireIcon')) {
+                map.addImage('fireIcon', image);
+            };
+        });
+        map.loadImage('../img/plane1.png', function (error, image) {
+            if (error) throw error
+            if (!map.hasImage('planeIcon')) {
+                map.addImage('planeIcon', image);
+            };
+        });
+        map.loadImage('../img/bus.png', function (error, image) {
+            if (error) throw error
+            if (!map.hasImage('busIcon')) {
+                map.addImage('busIcon', image);
+            };
+        });
+
+        map.loadImage('../img/landMarker1.png', function (error, image) {
+            if (error) throw error
+            if (!map.hasImage('landIcon')) {
+                map.addImage('landIcon', image);
+            };
+            map.addLayer({
+                id: "landMarker",
+                type: "symbol",
+                source: "landMarker-tiles",
+                "source-layer": "landMarker",
+                minzoom: 13,
+                layout: {
+                    'icon-image': 'landIcon',
+                    'icon-size': 0.1,
+                    'icon-offset': [0, -150],
+                    // 'icon-rotation-alignment': 'map',
+                    'icon-allow-overlap': true,
+                    'icon-ignore-placement': true
+                }
+            });
+        });
+
+        map.on('load', function () {
+            map.addLayer({
+                'id': 'landMarker-Symb',
+                'type': 'symbol',
+                'source': "landMarker-tiles",
+                'source-layer': 'landMarker',
+                minzoom: 13,
+                'layout': {
+                    "text-font": ["YaHei"],
+                    "text-field": ["get", "landName"],
+                    "text-size": 10,
+                    "icon-size": 2
+                },
+                "paint": {
+                    'icon-opacity': 0.8,
+                    "text-color": "#ff0000",
+                    "text-halo-color": "hsl(0, 8%, 100%)",
+                    "text-halo-width": 1
+                },
+
+            });
+        });
+
+
+        map.loadImage('../img/department2.png', function (error, image) {
+            if (error) throw error
+            if (!map.hasImage('departmentIcon2')) {
+                map.addImage('departmentIcon2', image);
+            };
+            map.addLayer({
+                id: "departmentMarker",
+                type: "symbol",
+                source: "department-tiles",
+                "source-layer": "department",
+                // maxzoom: 13,
+                layout: {
+                    'icon-image': ['match', ['get', 'DID'],
+                        1, 'departmentIcon1',
+                        20, 'busIcon',
+                        21, 'fireIcon',
+                        22, 'planeIcon',
+                        'departmentIcon2'
+                    ],
+                    'icon-size': 0.15,
+                    'icon-offset': [0, -150],
+                    // 'icon-rotation-alignment': 'map',
+                    'icon-allow-overlap': true,
+                    'icon-ignore-placement': true
+                }
+            });
+        });
+
+        map.on('load', function () {
+            map.addLayer({
+                'id': 'department-Symb',
+                'type': 'symbol',
+                'source': "department-tiles",
+                'source-layer': 'department',
+                // maxzoom: 13,
+                'layout': {
+                    "text-font": ["YaHei"],
+                    "text-field": ["get", "department"],
+                    "text-size": 11,
+                    'text-allow-overlap': true,
+                    'text-ignore-placement': true
+                },
+                "paint": {
+                    'icon-opacity': 0.8,
+                    "text-color": "#ff0000",
+                    "text-halo-color": "hsl(0, 8%, 100%)",
+                    "text-halo-width": 1
+                },
+
+            });
+        });
+
+        // var planeMarker = new mapboxgl.Marker('planeIcon')
+        //     .setLngLat([113.848056, 22.613534])
+        //     .addTo(map);
+        // var fireMarker = new mapboxgl.Marker('fireIcon')
+        //     .setLngLat([114.077, 22.547])
+        //     .addTo(map);
+
+        // var busMarker = new mapboxgl.Marker('busIcon')
+        //     .setLngLat([114.047058, 22.571924])
+        //     .addTo(map);
+
+    //   var poi = [[114.103,22.547],[114.102084,22.557792]]
+    //   var marker = document.getElementById("marker");
+    //   var marker = new mapboxgl.Marker()
+    //     .setLngLat([114.114768,22.55095])
+    //     .addTo(map);
+    // poi.forEach(element => {
+    //     let marker = new mapboxgl.Marker()
+    //         .setLngLat(element)
+    //         .addTo(map);
+    // });
+
+
+
+    // let img1 = new Image();
+    // img1.src = 'E:\测试\mapbox\img\department1.png';
+    // let img2 = new Image();
+    // img2.src = './'
+
+    // let curMarker = new mapboxgl.Marker(img1, {offset: [0, -15]})
+    //           .setLngLat([114.114768,22.55095])
+    //           .addTo(map);
+    // let el = document.createElement('div');
+    // el.innerHTML = '要显示的文字';
+    // let currentMarkerTitle = new mapboxgl.Marker(el, {offset: [0, -25]})
+    //           .setLngLat([114.114768,22.55095])
+    //           .addTo(map);
+
+    // let scale = new mapboxgl.ScaleControl({
+    //     maxWidth: 80,
+    //     unit: 'imperial'
+    // });
+    // map.addControl(scale);
+    // scale.setUnit('metric');
+    // // 全屏按钮
+    // map.addControl(new mapboxgl.FullscreenControl());
+
+    </script>
+
+</body>
+
+</html>
